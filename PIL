@@ -1,0 +1,131 @@
+import os
+import numpy as np
+from PIL import Image, ImageDraw
+##########################################
+# 读入图片,默认为RGB顺序，读出的变量img类型为Image类型, size为(width，height)，但是为彩色三通道图像
+img = Image.open(os.path.join('images', '000906' + '.jpg'))
+
+#显示图像
+img.show()
+
+#返回图像的格式，'JPEG'
+print img.format 
+
+#返回图像大小，(width，height)
+print img.size 
+
+#输出RGB
+print img.mode
+
+#输出元组('R', 'G', 'B')
+print img.getbands() 
+
+##########################################
+
+#装换Image格式为numpy数组array格式，进行图像处理
+#上面读出的img还是Image格式，不能对其直接处理，需要对其转换为array格式
+#这里需要注意的是未转换格式之前img.size为(width，height),转换之后img.shape为（height,width,3）
+
+img = np.array(img, dtype = np.uint8)
+
+#保存图片
+img.save(os.path.join('images', '13' + '.jpg'))
+
+#如果需要保存的图片变量是数组array形式的，需要先转换为Image格式，然后再保存
+img = Image.fromarray(img.astype(np.uint8)) #由img.shape为（height,width,3）转换为img.size为(width，height)
+
+img.save(os.path.join('images', '13' + '.jpg'))
+
+如果获取图像的最大值max()之类的，也把img转换为array格式，再计算
+
+##########################################
+
+#缩放图像
+img = Image.open(os.path.join('images', '000906' + '.jpg'))
+
+img_resized = img.resize((width,height)) #和读入图像的格式相同，也是先width后height
+
+#如果想改变插值算法，可以如下(默认为NEAREST)
+
+im_resized = im.resize((width,height), Image.BILINEAR)
+
+#NEAREST：最近滤波。从输入图像中选取最近的像素作为输出像素。它忽略了所有其他的像素。
+#BILINEAR：双线性滤波。在输入图像的2x2矩阵上进行线性插值。注意：PIL的当前版本，做下采样时该滤波器使用了固定输入模板。
+#BICUBIC：双立方滤波。在输入图像的4x4矩阵上进行立方插值。注意：PIL的当前版本，做下采样时该滤波器使用了固定输入模板。
+#ANTIALIAS：平滑滤波。这是PIL 1.1.3版本中新的滤波器。对所有可以影响输出像素的输入像素进行高质量的重采样滤波，以计算输出像素值。在当前的PIL版本中，这个滤波器只用于改变尺寸和缩略图方法。
+#注意：在当前的PIL版本中，ANTIALIAS滤波器是下采样（例如，将一个大的图像转换为小图）时唯一正确的滤波器。BILIEAR和BICUBIC滤波器使用固定的输入模板，用于固定比例的几何变换和上采样是最好的。
+
+##########################################
+
+#画直线，矩形需要用到PIL的ImageDraw模块
+
+img = Image.open(os.path.join('images', '000906' + '.jpg')) #读入图像
+
+draw = ImageDraw.Draw(img) #导入模块
+
+x1 = 20  # 第一个点列坐标
+y1 = 50  #第一个点行坐标
+x2 = 500 #第二个点列坐标
+y2 = 350 #第二个点行坐标
+
+#下面的这两种形式[]或者()都可以,fill制定颜色RGB，width制定宽度
+draw.line([x1,y1,x2,y2], fill = (255, 0, 0), width = 5)
+draw.line((x1,y1,x2,y2), fill = (255, 0, 0), width = 5)
+
+#下面是画多条直线，可以画出垂直的矩形或者旋转的矩形，四个点坐标形式与上面相同
+draw.line(((60,60),(90,60), (90,90), (60,90), (60,60)), fill = (255, 0, 0), width = 2)
+
+img.show() #显示
+img.save(os.path.join('images', '13' + '.jpg')) #保存在images/13.jpg
+
+#画矩形，这里和上面画直线差不多
+img = Image.open(os.path.join('images', '000906' + '.jpg'))
+draw = ImageDraw.Draw(img)
+
+#x表示列坐标，y表示行坐标
+x1 = 20
+y1 = 50
+x2 = 500
+y2 = 350
+
+#矩形左上角坐标和右下角坐标，后面是制定颜色RGB，红色
+draw.rectangle([x1, y1, x2, y2], outline=(255, 0, 0))
+
+#在左上角添加红色文字 ship
+draw.text([x1, y1], 'ship', (255, 0, 0))
+
+img.show() #显示
+img.save(os.path.join('images', '13' + '.jpg')) #保存在images/13.jpg
+
+##########################################
+
+#图像格式转化
+
+img = Image.open(os.path.join('images', '000906' + '.jpg'))
+
+#转化为灰度图
+gray=img.convert('L')
+
+#使用函数convert()来进行转换，它是图像实例对象的一个方法，接受一个 mode 参数，用以指定一种色彩模式，mode 的取值可以是如下几种：
+#· 1 (1-bit pixels, black and white, stored with one pixel per byte)
+#· L (8-bit pixels, black and white)
+#· P (8-bit pixels, mapped to any other mode using a colour palette)
+#· RGB (3x8-bit pixels, true colour)
+#· RGBA (4x8-bit pixels, true colour with transparency mask)
+#· CMYK (4x8-bit pixels, colour separation)
+#· YCbCr (3x8-bit pixels, colour video format)
+#· I (32-bit signed integer pixels)
+#· F (32-bit floating point pixels)
+
+#将灰度图转换为array格式，此时大小为(height,width),如果是彩色图像，为(height,width,3)
+gray = np.array(gray, dtype = np.uint8)
+
+##########################################
+
+#拆分通道和合并通道
+
+#拆分的通道，比如r，为灰度图，Model:L, 大小为(width,height),还是为Image格式，不能直接处理，需要转化为array格式
+r,g,b = img.split()
+
+#合并后的图像 Model: RGB, 大小为(width,height),还是为Image格式，不能直接处理，需要转化为array格式
+img_merged = Image.merge('RGB',(r,g,b)) 
