@@ -9,4 +9,6 @@
 上传图片
 #### ② face_locations( )
 定位人脸位置
+#### ③ face_landmarks( )
+人脸关键点定位
 ### 2. [PIL](https://github.com/15124192655/Notebook/blob/master/PIL)
