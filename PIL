@@ -8,6 +8,9 @@ img = Image.open(os.path.join('images', '000906' + '.jpg'))
 #显示图像
 img.show()
 
+#显示图像特定区域
+image[top:bottom, left:right]
+
 #返回图像的格式，'JPEG'
 print img.format 
 
